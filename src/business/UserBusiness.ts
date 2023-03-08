@@ -1,10 +1,10 @@
 import { BadRequestError } from "../errors/BadRequestError";
 import { NotFoundError } from "../errors/NotFoundError";
-import { SignupInputDTO, SignupOutputDTO,  DeleteUserInputDTO,  DeleteUserOutputDTO,  EditUserInputDTO,  EditUserOutputDTO,  LoginInputDTO, LoginOutputDTO, UserDTO  } from "../dtos/UserDTO"
+import { SignupInputDTO, DeleteUserInputDTO,  DeleteUserOutputDTO,  EditUserInputDTO,  EditUserOutputDTO,  LoginInputDTO, LoginOutputDTO, UserDTO, GetUsersInputDTO, GetUsersOutputDTO  } from "../dtos/UserDTO"
 import { HashManager } from "../services/HashManager";
 import { IdGenerator } from "../services/IdGenerator";
 import { TokenManager } from "../services/TokenManager";
-import { Role, TokenPayload } from "../types";
+import { Role, TokenPayload} from "../types";
 import { User } from "../models/UserModel";
 import { UserDatabase } from "../database/UserDatabase";
 
@@ -20,6 +20,42 @@ export class UserBusiness {
         private userDTO: UserDTO
     ) { }
 
+    public getUsers = async (input: GetUsersInputDTO): Promise<GetUsersOutputDTO> => {
+        const { token } = input
+
+        if (token === undefined) {
+            throw new BadRequestError("token é necessário")
+        }
+
+        const payload = this.tokenManager.getPayload(token)
+
+        if (payload === null) {
+            throw new BadRequestError("'token' inválido")
+        }
+
+        const usersDB = await this.userDatabase.getAllUsers()
+
+        const users = usersDB.map((userDB) => {
+            const user = new User (
+                userDB.id,
+                userDB.name,
+                userDB.email,
+                userDB.password,
+                userDB.role,
+                userDB.created_at,
+                userDB.updated_at
+                
+
+            )
+            return user.toBusinessModel()
+        })
+
+        const output: GetUsersOutputDTO = users
+
+        return output
+    }
+
+
     public signupUser = async (input: SignupInputDTO) => {
         const { name, email, password } = input
 
@@ -32,7 +68,7 @@ export class UserBusiness {
         }
 
         if (!email.match(regexEmail)) {
-            throw new BadRequestError("'email' deve possuir letras minúsculas, deve ter um @, letras minúsculas, ponto (.) e de 2 a 4 letras minúsculas")
+            throw new BadRequestError("'email' deve possuir letras maiúsculas, deve ter um @, letras minúsculas, ponto (.) e de 2 a 4 letras minúsculas")
         }
 
         if (typeof password !== "string") {
@@ -53,7 +89,9 @@ export class UserBusiness {
             email,
             passwordHash,
             Role.NORMAL,
-            new Date().toISOString()
+            new Date().toISOString(),
+            new Date().toISOString(),
+            
         )
 
         const newUserDB = {
@@ -62,7 +100,9 @@ export class UserBusiness {
             email: newUser.getEmail(),
             password: newUser.getPassword(),
             role: newUser.getRole(),
-            created_at: newUser.getCreatedAt()
+            created_at: newUser.getCreatedAt(),
+            updated_at: newUser.getCreatedAt()
+
         }
 
         await this.userDatabase.insertUser(newUserDB)
@@ -105,7 +145,8 @@ export class UserBusiness {
             userDB.email,
             userDB.password,
             userDB.role,
-            userDB.created_at
+            userDB.created_at,
+            userDB.updated_at
         )
 
         const passwordHash = await this.hashManager.compare(password, userDB.password)
@@ -169,6 +210,7 @@ export class UserBusiness {
             userDB.password,
             userDB.role,
             userDB.created_at,
+            userDB.updated_at
         )
         if(password){
             const hashedPassword = await this.hashManager.hash(password)

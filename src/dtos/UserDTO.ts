@@ -1,6 +1,6 @@
 import { BadRequestError } from "../errors/BadRequestError";
 import { User } from "../models/UserModel";
-import { Role } from "../types";
+import { Role, UserTemplate } from "../types";
 
 export interface SignupInputDTO {
     name: string,
@@ -15,8 +15,8 @@ export interface SignupOutputDTO {
         name: string,
         email: string,
         role: Role,
-        createdAt: string,
-        updatedAt: string
+        created_at: string,
+        updated_at: string
 
     },
     token: string
@@ -51,8 +51,8 @@ export interface EditUserOutputDTO{
         name: string,
         email: string,
         role: Role,
-        createdAt: string,
-        updatedAt: string
+        created_at: string,
+        updated_at: string
 
     }
 
@@ -129,6 +129,8 @@ export class UserDTO {
         }
         return dto
     }
+
+    
 
     public EditUserInputDTO = (
         id:unknown,
@@ -209,6 +211,12 @@ export class UserDTO {
 
 }
 
+export interface GetUsersInputDTO {
+    token: string | undefined
+}
+
+export type GetUsersOutputDTO = UserTemplate[]
+
 export interface EditUserInputDTO{
     id?:string
     email?:string,
@@ -224,8 +232,8 @@ export interface EditUserOutputDTO{
         name: string,
         email: string,
         role: Role,
-        createdAt: string,
-        updatedAt: string
+        created_at: string,
+        updated_at: string
 
     }
 

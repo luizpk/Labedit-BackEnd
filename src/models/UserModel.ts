@@ -7,7 +7,8 @@ export class User {
         private email: string,
         private password: string,
         private role: Role,
-        private createdAt: string
+        private created_at: string,
+        private updated_at: string
     ) { }
 
     public getId(): string {
@@ -51,11 +52,11 @@ export class User {
     }
 
     public getCreatedAt(): string {
-        return this.createdAt
+        return this.created_at
     }
 
     public setCreatedAt(value: string): void {
-        this.createdAt = value
+        this.created_at = value
     }
 
     public toDatabaseModel(): UserDB {
@@ -65,7 +66,8 @@ export class User {
             email: this.email,
             password: this.password,
             role: this.role,
-            created_at: this.createdAt
+            created_at: this.created_at,
+            updated_at: this.updated_at
         }
     }
 
@@ -75,8 +77,8 @@ export class User {
         name:this.name,
         email:this.email,
         role:this.role,
-        createdAt:this.createdAt,
-        updatedAt:this.updatedAt
+        created_at:this.created_at,
+        updated_at:this.updated_at
     }
 }
 
@@ -87,7 +89,8 @@ export class User {
             email: this.email,
             password: this.password,
             role: this.role,
-            createdAt: this.createdAt
+            created_at: this.created_at,
+            updated_at: this.updated_at
         }
     }
 

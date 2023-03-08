@@ -9,7 +9,8 @@ export interface UserTemplate {
     email: string,
     password: string,
     role: Role,
-    createdAt: string
+    created_at: string,
+    updated_at: string
 }
 
 export interface UserDB {
@@ -18,7 +19,9 @@ export interface UserDB {
     email: string,
     password: string,
     role: Role,
-    created_at: string
+    created_at: string,
+    updated_at:string
+
 }
 
 export interface EditUserDB{
@@ -38,17 +41,8 @@ export interface UserOutput{
     name:string,
     email:string,
     role:Role,
-    createdAt:string,
-    updatedAt:string
+    created_at:string,
+    updated_at:string
 
 }
 
-export interface UserOutput{ 
-    id:string,
-    name:string,
-    email:string,
-    role:Role,
-    createdAt:string,
-    updatedAt:string
-
-}
