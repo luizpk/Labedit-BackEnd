@@ -10,14 +10,16 @@ import { TokenManager } from "../services/TokenManager"
 export const userRouter = express.Router()
 
 const userDTO = new UserDTO()
+
 const userController = new UserController(
-        userDTO,
-        new UserBusiness(
-            userDTO,
-            new UserDatabase(),
-            new IdGenerator(),
-            new TokenManager(),
-            new HashManager()
+    userDTO,
+    new UserBusiness(
+        
+        new UserDatabase(),
+        new IdGenerator(),
+        new TokenManager(),
+        new HashManager(),
+        new UserDTO,
     )
 )
 

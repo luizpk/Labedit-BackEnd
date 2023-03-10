@@ -24,7 +24,7 @@ export class UserBusiness {
         const { token } = input
 
         if (token === undefined) {
-            throw new BadRequestError("token é necessário")
+            throw new BadRequestError("É necessário um token")
         }
 
         const payload = this.tokenManager.getPayload(token)
@@ -33,9 +33,9 @@ export class UserBusiness {
             throw new BadRequestError("'token' inválido")
         }
 
-        const usersDB = await this.userDatabase.getAllUsers()
+        const usersDataBase = await this.userDatabase.getAllUsers()
 
-        const users = usersDB.map((userDB) => {
+        const users = usersDataBase.map((userDB) => {
             const user = new User (
                 userDB.id,
                 userDB.name,
@@ -60,19 +60,19 @@ export class UserBusiness {
         const { name, email, password } = input
 
         if (typeof name !== "string") {
-            throw new BadRequestError("'Name' deve ser string")
+            throw new BadRequestError("'Name' deve ser uma string")
         }
 
         if (typeof email !== "string") {
-            throw new BadRequestError("'email' deve ser string")
+            throw new BadRequestError("Digite um e-mail válido")
         }
 
         if (!email.match(regexEmail)) {
-            throw new BadRequestError("'email' deve possuir letras maiúsculas, deve ter um @, letras minúsculas, ponto (.) e de 2 a 4 letras minúsculas")
+            throw new BadRequestError("Digite um e-mail válido")
         }
 
         if (typeof password !== "string") {
-            throw new BadRequestError("'password' deve ser string")
+            throw new BadRequestError("'password' deve ser uma string")
         }
 
         if (!password.match(regexPassword)) {
@@ -122,15 +122,17 @@ export class UserBusiness {
         return output
     }
 
+
+
     public loginUser = async (input: LoginInputDTO) => {
         const { email, password } = input
 
         if (typeof email !== "string") {
-            throw new BadRequestError("'email' deve ser string")
+            throw new BadRequestError("'email' deve ser uma string")
         }
 
         if (typeof password !== "string") {
-            throw new BadRequestError("'password' deve ser string")
+            throw new BadRequestError("'password' deve ser uma string")
         }
 
         const userDB = await this.userDatabase.findUserByEmail(email)
@@ -174,24 +176,25 @@ export class UserBusiness {
         const {id,email, password,role,token} = input
 
         const payload = this.tokenManager.getPayload(token)
+        
         if(payload === null){
-            throw new BadRequestError("Token invalido")
+            throw new BadRequestError("Token é inválido")
         }
         if(id){
 
             if(payload.role !== Role.ADMIN){
                 if(payload.id!==id){
-                    throw new BadRequestError("Usuarios 'NORMAL' so pode editar a si mesmo")
+                    throw new BadRequestError("Você só tem permissão para editar seu próprio cadastro")
                 }
             }
         }
 
         if(role && payload.role !== Role.ADMIN){
-            throw new BadRequestError("Usuario precisa ser ADMIN para trocar o role de um usuario")
+            throw new BadRequestError("Somente o ADMIN pode efetuar a troca de perfil")
         }
         if(password!==undefined){
             if(!password.match(regexPassword)){
-                throw new BadRequestError("Password teve conter pelo menos 1 letra Maiuscula, 1 letra minuscula, 1 caracter especial, 1 numero e ter de 8 a 12 caracteres");
+                throw new BadRequestError("'password' deve possuir entre 8 e 12 caracteres, com letras maiúsculas e minúsculas e no mínimo um número e um caractere especial");
             }
             if(payload.id!==id){
                 throw new BadRequestError("Apenas o proprio usuario pode editar seu password")
@@ -240,13 +243,23 @@ export class UserBusiness {
     public deleteUser = async (input:DeleteUserInputDTO):Promise<DeleteUserOutputDTO> => {
         const {id, token} = input
         const payload = this.tokenManager.getPayload(token)
+
         if(payload === null){
             throw new BadRequestError("Token invalido")
         }
+
+        const userDBExists = await this.userDatabase.getUserById(id)
+
+        if (!userDBExists) {
+            throw new NotFoundError("usuário não encontrado");
+        }
+
+        const creatorId = payload.id
+
         if(id){
-            if(payload.role!==Role.ADMIN){
+            if(payload.role!==Role.ADMIN && userDBExists.id !== creatorId){
                 if(payload.id!==id){
-                    throw new BadRequestError("Um usuario 'NORMAL' pode deletar somente si mesmo")
+                    throw new BadRequestError("Você não tem permissão para deletar outro usuário")
                 }
             }
         }

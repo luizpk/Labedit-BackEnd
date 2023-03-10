@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { UserBusiness } from "../business/UserBusiness";
-import { LoginInputDTO, SignupInputDTO, UserDTO, EditUserOutputDTO, DeleteUserOutputDTO } from "../dtos/UserDTO";
+import { LoginInputDTO, SignupInputDTO, UserDTO, EditUserOutputDTO, DeleteUserOutputDTO, EditUserInputDTO, DeleteUserInputDTO } from "../dtos/UserDTO";
 import { BaseError } from "../errors/BaseError";
 
 export class UserController {
@@ -8,6 +8,7 @@ export class UserController {
         private userDTO: UserDTO,
         private userBusiness: UserBusiness
     ) { }
+
 
     public signupUser = async (req: Request, res: Response) => {
         try {
@@ -54,13 +55,14 @@ export class UserController {
 
     public editUser =async (req:Request, res:Response) => {
         try {
-            const input = this.userDTO.EditUserInputDTO(
+            const input= this.userDTO.EditUserInputDTO(
                 req.query.id,
                 req.body.email,
                 req.body.password,
                 req.body.role,
                 req.headers.authorization
             )
+                
             const output: EditUserOutputDTO = await this.userBusiness.editUser(input)
             res.status(200).send(output)
 
@@ -81,7 +83,7 @@ export class UserController {
                 req.query.id,
                 req.headers.authorization
             )
-            const output : DeleteUserOutputDTO  = await this.userBusiness.deleteUser(input)
+            const output = await this.userBusiness.deleteUser(input)
             res.status(200).send(output)
 
         } catch (error) {

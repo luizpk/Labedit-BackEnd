@@ -183,8 +183,8 @@ export class UserDTO {
     }
 
     public DeleteUserInputDTO = (
-        id:unknown,
-        token:unknown
+        id:string,
+        token:string
     ):DeleteUserInputDTO=>{
         if(id!==undefined){
             if(typeof id !== 'string'){

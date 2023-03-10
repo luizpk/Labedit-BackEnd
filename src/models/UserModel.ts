@@ -15,10 +15,7 @@ export class User {
         return this.id
     }
 
-    public setId(value: string): void {
-        this.id = value
-    }
-
+    
     public getName(): string {
         return this.name
     }
@@ -98,9 +95,11 @@ export class User {
         return{
            email:this.email,
            password:this.password,
-           role:this.role, 
+           role:this.role,
+           updated_at:this.updated_at 
                   
         }
        }
 
 }
+

@@ -28,6 +28,7 @@ export interface EditUserDB{
     email:string, 
     password:string,
     role:Role, 
+    updated_at:string
 }
 
 export interface TokenPayload {
