@@ -28,7 +28,6 @@ export interface EditUserDB{
     email:string, 
     password:string,
     role:Role, 
-    updated_at:string
 }
 
 export interface TokenPayload {
@@ -45,5 +44,42 @@ export interface UserOutput{
     created_at:string,
     updated_at:string
 
+}
+
+export interface PostModel {
+    id: string,
+    content: string,
+    likes: number,
+    dislikes: number,
+    comments: number,
+    created_at: string,
+    updated_at: string,
+    creator: {
+        id: string,
+        name: string
+    }
+}
+
+export interface PostDB{
+    id:string,
+    creator_id:string,
+    content:string,
+    likes:number,
+    dislikes:number,
+    comments:number,
+    created_at:string,
+    updated_at:string
+}
+
+export interface PostEditDB{
+    content?:string,
+    likes?:number,
+    dislikes?:number,
+    comments?:number,
+    updated_at?:string
+}
+
+export interface PostWithCreatorDB extends PostDB {
+    creatorName: string
 }
 
