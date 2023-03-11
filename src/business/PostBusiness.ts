@@ -19,7 +19,7 @@ export class PostBusiness {
         const { token } = input
 
         if (token === undefined) {
-            throw new BadRequestError("token é necessário")
+            throw new BadRequestError("Post necessita de um token")
         }
 
         const payload = this.tokenManager.getPayload(token)
@@ -56,7 +56,7 @@ export class PostBusiness {
         const { content, token } = input
 
         if (token === undefined) {
-            throw new BadRequestError("token ausente")
+            throw new BadRequestError("Post necessita de um token")
         }
 
         const payload = this.tokenManager.getPayload(token)
@@ -76,11 +76,11 @@ export class PostBusiness {
             content,
             0,
             0,
-            comments,
+            0,
             new Date().toISOString(),
             new Date().toISOString(),
             payload.id,
-            payload.nickName
+            payload.name
         )
 
         const newPostDB = newPost.toDBModel()
@@ -92,7 +92,7 @@ export class PostBusiness {
         const { idToEdit, token, content } = input
 
         if (token === undefined) {
-            throw new BadRequestError("token é necessário")
+            throw new BadRequestError("Post necessita de um token")
         }
 
         const payload = this.tokenManager.getPayload(token)
@@ -144,7 +144,7 @@ export class PostBusiness {
         const { idToDelete, token } = input
 
         if (token === undefined) {
-            throw new BadRequestError("token é necessário")
+            throw new BadRequestError("Post necessita de um token")
         }
 
         const payload = this.tokenManager.getPayload(token)
@@ -170,11 +170,11 @@ export class PostBusiness {
 
     }
 
-    public likeOrDislikePost = async (input: LikeOrDislikePostInputDTO): Promise<void> => {
+    public likeDislikePost = async (input: LikeOrDislikePostInputDTO): Promise<void> => {
         const { idToLikeOrDislike, token, like } = input
 
         if (token === undefined) {
-            throw new BadRequestError("token é necessário")
+            throw new BadRequestError("Post necessita de um token")
         }
 
         const payload = this.tokenManager.getPayload(token)
@@ -196,7 +196,11 @@ export class PostBusiness {
         const userId = payload.id
         const likeSQLite = like ? 1 : 0
 
-        
+        const likeDislikeDB: LikeDislikeDB = {
+            user_id: userId,
+            post_id: postWithCreatorDB.id,
+            like: likeSQLite
+        }
 
         const post = new Post(
             postWithCreatorDB.id,
@@ -209,6 +213,35 @@ export class PostBusiness {
             postWithCreatorDB.creator_id,
             postWithCreatorDB.creatorName
         )
+
+        const likeDislikeExists = await this.postDatabase
+            .findLikeDislike(likeDislikeDB)
+
+        if (likeDislikeExists === POST_LIKE.ALREADY_LIKED) {
+            if (like) {
+                await this.postDatabase.removeLikeDislike(likeDislikeDB)
+                post.removeLike()
+            } else {
+                await this.postDatabase.updateLikeDislike(likeDislikeDB)
+                post.removeLike()
+                post.addDislike()
+            }
+
+        } else if (likeDislikeExists === POST_LIKE.ALREADY_DISLIKED) {
+            if (like) {
+                await this.postDatabase.updateLikeDislike(likeDislikeDB)
+                post.removeDislike()
+                post.addLike()
+            } else {
+                await this.postDatabase.removeLikeDislike(likeDislikeDB)
+                post.removeDislike()
+            }
+
+        } else {
+            await this.postDatabase.likeOrDislikePost(likeDislikeDB)
+
+            like ? post.addLike() : post.addDislike()
+        }
 
         
         const updatedPostDB = post.toDBModel()
