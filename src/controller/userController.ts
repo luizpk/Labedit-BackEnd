@@ -80,7 +80,7 @@ export class UserController {
     public deleteUser =async (req:Request, res:Response) => {
         try {
             const input = this.userDTO.DeleteUserInputDTO(
-                req.query.id,
+                req.params.id,
                 req.headers.authorization
             )
             const output = await this.userBusiness.deleteUser(input)

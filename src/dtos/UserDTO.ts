@@ -58,7 +58,7 @@ export interface EditUserOutputDTO{
 
 }
 export interface DeleteUserInputDTO{
-    id?:string,
+    id?:string | undefined,
     token:string
 }
 export interface DeleteUserOutputDTO{

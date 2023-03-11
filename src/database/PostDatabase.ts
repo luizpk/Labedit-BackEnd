@@ -1,4 +1,4 @@
-import { PostDB, PostWithCreatorDB, } from "../types"
+import { CommentWithCreatorDB, LikeDislikeDB, PostDB, PostWithCreatorDB, POST_LIKE, } from "../types"
 import { BaseDatabase } from "./BaseDatabase"
 import { CommentDatabase } from "./CommentDatabase"
 
@@ -134,8 +134,8 @@ export class PostDatabase extends BaseDatabase {
 
         if (likeDislikeDB) {
             return likeDislikeDB.like === 1
-                ? POST_LIKE.ALREADY_LIKED
-                : POST_LIKE.ALREADY_DISLIKED
+                ? POST_LIKE.LIKED
+                : POST_LIKE.DISLIKED
 
         } else {
             return null
