@@ -5,7 +5,7 @@ import { NotFoundError } from "../errors/NotFoundError"
 import { Post } from "../models/PostModel"
 import { IdGenerator } from "../services/IdGenerator"
 import { TokenManager } from "../services/TokenManager"
-import { PostWithCreatorDB,Role } from "../types"
+import { LikeDislikeDB, PostWithCreatorDB,POST_LIKE,Role } from "../types"
 
 export class PostBusiness {
     constructor(
@@ -217,7 +217,7 @@ export class PostBusiness {
         const likeDislikeExists = await this.postDatabase
             .findLikeDislike(likeDislikeDB)
 
-        if (likeDislikeExists === POST_LIKE.ALREADY_LIKED) {
+        if (likeDislikeExists === POST_LIKE.LIKED) {
             if (like) {
                 await this.postDatabase.removeLikeDislike(likeDislikeDB)
                 post.removeLike()
@@ -227,7 +227,7 @@ export class PostBusiness {
                 post.addDislike()
             }
 
-        } else if (likeDislikeExists === POST_LIKE.ALREADY_DISLIKED) {
+        } else if (likeDislikeExists === POST_LIKE.DISLIKED) {
             if (like) {
                 await this.postDatabase.updateLikeDislike(likeDislikeDB)
                 post.removeDislike()

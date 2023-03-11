@@ -53,3 +53,68 @@ VALUES (
         DATETIME()
     );
 
+    CREATE TABLE
+    likes_dislikes (
+        user_id TEXT NOT NULL,
+        post_id TEXT NOT NULL,
+        like INTEGER NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE ON UPDATE CASCADE,
+        FOREIGN KEY (post_id) REFERENCES posts (id) ON DELETE CASCADE ON UPDATE CASCADE
+    );
+
+    INSERT INTO
+    likes_dislikes (user_id, post_id, like)
+VALUES ("0ce9d89c-5c8c-4f96-94fa-6be60293e570", "3ed86a84-7b11-4938-adc2-76cb34fce650", 1), 
+("dd993181-950b-48ab-bee7-4475176a5607", "28587980-f073-4f34-8544-bdd3d04e0568", 1), 
+("33ebabf1-c909-4f3c-b573-4b8d5d4e5a02", "3ed86a84-7b11-4938-adc2-76cb34fce650", 1), 
+("a4a18c72-2e78-4175-9605-46f6c63c0aed", "28587980-f073-4f34-8544-bdd3d04e0568", 1), 
+("0ce9d89c-5c8c-4f96-94fa-6be60293e570", "862ff385-deac-4aa8-b1ee-3d81ba3ec0f4", 0);
+
+CREATE TABLE
+    comment (
+        id TEXT PRIMARY KEY UNIQUE NOT NULL,
+        post_id TEXT NOT NULL,
+        user_id TEXT NOT NULL,
+        comments TEXT NOT NULL,
+        likes INTEGER,
+        dislikes INTEGER,
+        created_at TEXT DEFAULT (DATETIME()) NOT NULL,
+        FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE ON UPDATE CASCADE FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE
+    );
+
+    INSERT INTO comment (id, post_id, user_id, comments)
+VALUES
+    ("54218797-4f7e-4a42-9ccb-85e1a58efe76", "28587980-f073-4f34-8544-bdd3d04e0568", "33ebabf1-c909-4f3c-b573-4b8d5d4e5a02", "Adoro quando você inventa coisa nova!"),
+    ("1af1fc54-1f4f-4352-aaee-b3cca5fa0ff0", "3ed86a84-7b11-4938-adc2-76cb34fce650", "0ce9d89c-5c8c-4f96-94fa-6be60293e570", "Você já está tão moço! Mamãe tem muito orgulho."),
+    ("4f22b69e-9969-4e2b-8b06-a0da4ceb90d8", "862ff385-deac-4aa8-b1ee-3d81ba3ec0f4", "dd993181-950b-48ab-bee7-4475176a5607", "Vovô, o senhor ainda vai me ver formar na faculdade!");
+
+    CREATE TABLE
+    comment_likes_dislikes (
+        post_id TEXT NOT NULL,
+        user_id TEXT NOT NULL,
+        comment_id TEXT NOT NULL,
+        like INTEGER NOT NULL,
+        FOREIGN KEY (post_id) REFERENCES posts (id) ON DELETE CASCADE ON UPDATE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE ON UPDATE CASCADE,
+        FOREIGN KEY (comment_id) REFERENCES comment (id) ON DELETE CASCADE ON UPDATE CASCADE
+    );
+
+    SELECT
+    posts.id,
+    posts.creator_id,
+    posts.content,
+    posts.likes,
+    posts.dislikes,
+    posts.comments,
+    posts.created_at,
+    posts.updated_at,
+    users.name AS creator_Name
+    FROM posts
+    JOIN users ON posts.creator_id = users.id;
+
+
+SELECT * FROM posts;
+
+SELECT * FROM users;
+
+SELECT * FROM comment;

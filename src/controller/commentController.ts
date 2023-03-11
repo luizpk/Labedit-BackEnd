@@ -1,20 +1,22 @@
 import { Request, Response } from "express"
-import { PostBusiness } from "../business/PostBusiness"
-import { CreatePostInputDTO, DeletePostInputDTO, EditPostInputDTO, GetPostsInputDTO, LikeOrDislikePostInputDTO } from "../dtos/PostDTO"
+import { CommentBusiness } from "../business/CommentBusiness"
+import { CreateCommentInputDTO, DeleteCommentInputDTO, EditCommentInputDTO, GetCommentInputDTO, LikeDislikeCommentInputDTO } from "../dtos/CommentDTO"
 import { BaseError } from "../errors/BaseError"
 
-export class PostController {
+export class CommentController {
     constructor(
-        private postBusiness: PostBusiness
+        private commentBusiness: CommentBusiness
     ) { }
 
-    public getPosts = async (req: Request, res: Response) => {
+
+    public getCommentById = async (req: Request, res: Response) => {
         try {
-            const input: GetPostsInputDTO = {
+            const input: GetCommentInputDTO = {
+                idToSearch: req.params.id,
                 token: req.headers.authorization
             }
 
-            const output = await this.postBusiness.getPost(input)
+            const output = await this.commentBusiness.getCommentById(input)
 
             res.status(200).send(output)
         } catch (error) {
@@ -28,37 +30,20 @@ export class PostController {
         }
     }
 
-    public getPostsWithComment = async (req: Request, res: Response) => {
+
+
+    public CreateComment = async (req: Request, res: Response) => {
         try {
-            const input: GetPostsInputDTO = {
-                token: req.headers.authorization
-            }
-
-            const output = await this.postBusiness.getPost(input)
-
-            res.status(200).send(output)
-        } catch (error) {
-            console.log(error)
-
-            if (error instanceof BaseError) {
-                res.status(error.statusCode).send(error.message)
-            } else {
-                res.send("Erro inesperado")
-            }
-        }
-    }
-
-    
-    public CreatePost = async (req: Request, res: Response) => {
-        try {
-            const input: CreatePostInputDTO = {
+            const input: CreateCommentInputDTO = {
+                post_id: req.params.id,
                 token: req.headers.authorization,
-                content: req.body.content
+                comments: req.body.comments
             }
+            console.log(input.post_id);
 
-            const output = await this.postBusiness.createPost(input)
+            await this.commentBusiness.createComment(input)
 
-            res.status(201).send(output)
+            res.status(201).end()
         } catch (error) {
             console.log(error)
 
@@ -70,15 +55,17 @@ export class PostController {
         }
     }
 
-    public editPost = async (req: Request, res: Response) => {
+
+
+    public editComment = async (req: Request, res: Response) => {
         try {
-            const input: EditPostInputDTO = {
+            const input: EditCommentInputDTO = {
                 idToEdit: req.params.id,
-                content: req.body.content,
+                comments: req.body.content,
                 token: req.headers.authorization
             }
 
-            const output = await this.postBusiness.editPost(input)
+            const output = await this.commentBusiness.editComment(input)
 
             res.status(200).send(output)
         } catch (error) {
@@ -92,14 +79,16 @@ export class PostController {
         }
     }
 
-    public deletePost = async (req: Request, res: Response) => {
+
+
+    public deleteComment = async (req: Request, res: Response) => {
         try {
-            const input: DeletePostInputDTO = { 
+            const input: DeleteCommentInputDTO = { 
                 idToDelete: req.params.id,
                 token: req.headers.authorization
             }
 
-            const output = await this.postBusiness.deletePost(input)
+            const output = await this.commentBusiness.deleteComment(input)
 
             res.status(200).send(output)
 
@@ -114,16 +103,18 @@ export class PostController {
         }
     }
 
+
+
     public likeDislike = async (req: Request, res: Response) => {
         try {
 
-            const input: LikeOrDislikePostInputDTO = {
-                idToLikeOrDislike: req.params.id,
+            const input: LikeDislikeCommentInputDTO = {
+                idToLikeDislike: req.params.id,
                 token: req.headers.authorization,
                 like: req.body.like
             }
-           
-            await this.postBusiness.likeDislikePost(input)
+
+            await this.commentBusiness.likeOrDislikeComment(input)
 
             res.status(200).end()
         } catch (error) {
@@ -136,5 +127,4 @@ export class PostController {
             }
         }
     }
-    
 }
